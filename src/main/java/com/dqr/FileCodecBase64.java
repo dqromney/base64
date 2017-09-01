@@ -3,16 +3,19 @@ package com.dqr;
 /**
  * @author Kushal Paudyal
  * www.icodejava.com
- *
+ * <p>
  * This class can be used to Base64 encode or Base64 decode a file. It uses apache commons codec library.
  * The library used for testing the functionality was commons-codec-1.4.jar
  */
 
+import jargs.gnu.CmdLineParser;
+import lombok.extern.java.Log;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
+import java.util.logging.Level;
 
+@Log
 public class FileCodecBase64 {
 
     private static final boolean IS_CHUNKED = false;
@@ -20,20 +23,26 @@ public class FileCodecBase64 {
     public static void main(String args[]) throws Exception {
 
         String fileName;
-        String fileExt;
+        String fileNameBase64;
         String baseName;
 
-        if (args.length == 1) {
-            fileName = args[0];
-            baseName = FilenameUtils.getBaseName(fileName) + ".txt";
-            fileExt = FilenameUtils.getExtension(fileName);
-            /* Encode a file and write the encoded output to a text file. */
-            encode(fileName, baseName, IS_CHUNKED);
+        Arguments arguments = commandLineProcessor(args);
 
-            /* Decode a file and write the decoded file to file system */
-            decode(baseName, baseName + "-decoded." + fileExt);
-        }
-        else {
+        if (arguments.getPathFile() != null) {
+
+            fileName = arguments.getPathFile();
+            if (arguments.getEncode() == Boolean.TRUE) {
+                /* Encode a file and write the encoded output to a text file. */
+                fileNameBase64 = fileName + ".txt";
+                encode(fileName, fileNameBase64, IS_CHUNKED);
+            }
+            if (arguments.getDecode() == Boolean.TRUE) {
+                /* Decode a file and write the decoded file to file system */
+                baseName = fileName + arguments.getOutputExt();
+                decode(fileName, baseName);
+            }
+
+        } else {
             System.err.println("Missing file argument!");
         }
     }
@@ -90,5 +99,89 @@ public class FileCodecBase64 {
         writer.flush();
         writer.close();
 
+    }
+
+    public static Arguments commandLineProcessor(String[] args) {
+        CmdLineParser parser = new CmdLineParser();
+        Arguments arguments = new Arguments();
+
+//        CmdLineParser.Option consoleOpt = parser.addBooleanOption('c', "console");
+        CmdLineParser.Option helpOpt = parser.addBooleanOption('h', "help");
+        CmdLineParser.Option verboseOpt = parser.addBooleanOption('v', "verbose");
+        CmdLineParser.Option encodeOpt = parser.addBooleanOption('e', "encode");
+        CmdLineParser.Option decodeOpt = parser.addBooleanOption('d', "decode");
+        CmdLineParser.Option outDirOpt = parser.addStringOption('o', "outDir");
+        CmdLineParser.Option pathFileOpt = parser.addStringOption('f', "pathFile");
+        CmdLineParser.Option outputExtOpt = parser.addStringOption('x', "outputExt");
+
+        try {
+            parser.parse(args);
+        } catch (CmdLineParser.OptionException e) {
+            usage();
+            System.exit(1);
+        }
+
+        Boolean encode = (Boolean) parser.getOptionValue(encodeOpt);
+        if (encode != null && encode.booleanValue()) {
+            log.setLevel(Level.FINEST);
+            log.info("Setting to encode file.");
+            arguments.setEncode(encode);
+        }
+
+        Boolean decode = (Boolean) parser.getOptionValue(decodeOpt);
+        if (decode != null && decode.booleanValue()) {
+            log.setLevel(Level.FINEST);
+            log.info("Setting to decode file.");
+            arguments.setDecode(decode);
+        }
+
+        if ((encode != null && encode) && (decode != null && decode)) {
+            usage();
+            System.exit(0);
+        }
+
+        String pathFile = (String) parser.getOptionValue(pathFileOpt);
+        if (pathFile == null) {
+            usage();
+            System.exit(0);
+        } else {
+            arguments.setPathFile(pathFile);
+        }
+
+        String outDir = (String) parser.getOptionValue(outDirOpt);
+        if (outDir == null) {
+            outDir = "./";
+        } else {
+            arguments.setOutDir(outDir);
+        }
+
+        String outputExt = (String) parser.getOptionValue(outputExtOpt);
+        if (outputExt == null) {
+            outputExt = ".decoded";
+        } else {
+            arguments.setOutputExt(outputExt);
+        }
+
+        Boolean help = (Boolean) parser.getOptionValue(helpOpt);
+        if (help != null && help.booleanValue()) {
+            usage();
+            System.exit(0);
+        }
+
+        Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);
+        if (verbose != null && verbose.booleanValue()) {
+            log.setLevel(Level.FINEST);
+            log.info("Setting LogLevel to DEBUG.");
+        } else {
+            log.setLevel(Level.INFO);
+            log.info("Setting LogLevel to INFO.");
+        }
+
+        return arguments;
+    }
+
+    private static void usage() {
+        System.out.println("Use:");
+        System.out.println("\tjava FileCodecBase64Use.jar -f or --pathFile <pathFile> [-e --encode | -d --decode]\n");
     }
 }
