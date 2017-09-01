@@ -8,6 +8,7 @@ public class Arguments {
     private Boolean verbose = Boolean.FALSE;
     private Boolean encode = Boolean.FALSE;
     private Boolean decode = Boolean.FALSE;
+    private Boolean chunkMode = Boolean.FALSE;
     private String outDir;
     private String pathFile;
     private String outputExt = ".decoded";

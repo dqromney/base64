@@ -34,7 +34,7 @@ public class FileCodecBase64 {
             if (arguments.getEncode() == Boolean.TRUE) {
                 /* Encode a file and write the encoded output to a text file. */
                 fileNameBase64 = fileName + ".txt";
-                encode(fileName, fileNameBase64, IS_CHUNKED);
+                encode(fileName, fileNameBase64, arguments.getChunkMode());
             }
             if (arguments.getDecode() == Boolean.TRUE) {
                 /* Decode a file and write the decoded file to file system */
@@ -108,6 +108,7 @@ public class FileCodecBase64 {
 //        CmdLineParser.Option consoleOpt = parser.addBooleanOption('c', "console");
         CmdLineParser.Option helpOpt = parser.addBooleanOption('h', "help");
         CmdLineParser.Option verboseOpt = parser.addBooleanOption('v', "verbose");
+        CmdLineParser.Option chunkModeOpt = parser.addBooleanOption('c', "chunkMode");
         CmdLineParser.Option encodeOpt = parser.addBooleanOption('e', "encode");
         CmdLineParser.Option decodeOpt = parser.addBooleanOption('d', "decode");
         CmdLineParser.Option outDirOpt = parser.addStringOption('o', "outDir");
@@ -133,6 +134,12 @@ public class FileCodecBase64 {
             log.setLevel(Level.FINEST);
             log.info("Setting to decode file.");
             arguments.setDecode(decode);
+        }
+
+        Boolean chunkMode = (Boolean) parser.getOptionValue(chunkModeOpt);
+        if (chunkMode != null && chunkMode.booleanValue()) {
+            log.info("Setting to chunk mode file.");
+            arguments.setChunkMode(chunkMode);
         }
 
         if ((encode != null && encode) && (decode != null && decode)) {
