@@ -85,3 +85,6 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+.idea/libraries/Maven__jargs_jargs_1_0.xml
+.idea/libraries/Maven__org_projectlombok_lombok_1_16_16.xml
+.idea/workspace.xml
