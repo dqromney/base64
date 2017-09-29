@@ -189,6 +189,7 @@ public class FileCodecBase64 {
 
     private static void usage() {
         System.out.println("Use:");
-        System.out.println("\tjava FileCodecBase64Use.jar -f or --pathFile <pathFile> [-e --encode | -d --decode]\n");
+        System.out.println("\tjava -jar base64.jar [-f | --pathFile] <inputPathFile> [-e --encode | -d --decode]\n");
+        System.out.println("\t\tex. java -jar base64.jar --pathFile base64.jar --encode\t~ creates a file base64.jar.txt");
     }
 }
